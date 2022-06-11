@@ -15,8 +15,8 @@ fi
 sleep 1 && curl -s https://raw.githubusercontent.com/bitruss/sh/main/logo.sh | bash && sleep 3
 
 avail_space=`df $PWD -h | awk '/[0-9]%/{print $(NF-2)}' | sed 's/.$//'`
-if [ $avail_space -lt 40 ]; then
-	echo -e '\e[31mYou have less than 40GB available space, please free some space and retry install.\e[39m'
+if [ $avail_space -lt 20 ]; then
+	echo -e '\e[31mYou have less than 20GB available space, please free some space and retry install.\e[39m'
 	exit 1
 fi
 
@@ -27,15 +27,15 @@ function setupVars {
 	fi
 	echo -e '\n\e[42mYour meson token:' $MESON_TOKEN '\e[0m\n'
 	if [ ! $MESON_PORT ]; then
-		read -p "Enter your meson port (19091 by default): " MESON_PORT
-		MESON_PORT=${MESON_PORT:-19091}
+		read -p "Enter your meson port (443 by default): " MESON_PORT
+		MESON_PORT=${MESON_PORT:-443}
 		echo 'export MESON_PORT='${MESON_PORT} >> $HOME/.bash_profile
 	fi
 	echo -e '\n\e[42mYour meson port:' $MESON_PORT '\e[0m\n'
 	if [ ! $MESON_SPACELIMIT ]; then
 		echo -e '\e[42mAt this moment you have' $avail_space 'GB available space\e[0m'
-		read -p "Enter your spacelimit for Meson (at least 40GB), ONLY NUMBER (without GB): " MESON_SPACELIMIT
-		MESON_SPACELIMIT=${MESON_SPACELIMIT:-40}
+		read -p "Enter your spacelimit for Meson (at least 20GB), ONLY NUMBER (without GB): " MESON_SPACELIMIT
+		MESON_SPACELIMIT=${MESON_SPACELIMIT:-20}
 		echo 'export MESON_SPACELIMIT='${MESON_SPACELIMIT} >> $HOME/.bash_profile
 	fi
 	echo -e '\n\e[42mYour Meson spacelimit:' $MESON_SPACELIMIT '\e[0m\n'
@@ -60,7 +60,7 @@ function installSoftware {
 	ufw allow 80
 	ufw allow 443
 	ufw allow 19091
-	wget 'https://coldcdn.com/api/cdn/f2cobx/terminal/v2.5.2/meson-linux-amd64.tar.gz'
+	wget 'https://dashboard.meson.network/static_assets/node/v3.0.0/meson-linux-amd64.tar.gz'
 	tar -zxf meson-linux-amd64.tar.gz
 	cd ./meson-linux-amd64
 echo "#token register and login in https://meson.network
@@ -68,10 +68,10 @@ token = $MESON_TOKEN
 
 # server port DO NOT run in 80 or 443
 # open this port on your firewall
-# default 19091
+# default 443
 port = $MESON_PORT
 
-# space limit (Maximum allowable space for Terminal in GB. Less than the total disk. At least 40 GB)
+# space limit (Maximum allowable space for Terminal in GB. Less than the total disk. At least 20 GB)
 spacelimit = $MESON_SPACELIMIT
 " > $HOME/meson-linux-amd64/config.txt
 	sudo $HOME/meson-linux-amd64/meson service-install
